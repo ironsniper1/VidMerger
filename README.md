@@ -1,10 +1,10 @@
-# VidMerger v1.0
+# VidMerger v1.1
 
 > A Windows desktop app for content creators who publish on both YouTube and LBRY/Odysee. Load your video libraries from both platforms, compare them side by side, and sync what's missing — automatically or one video at a time.
 
 ![Platform](https://img.shields.io/badge/platform-Windows-blue)
 ![Framework](https://img.shields.io/badge/.NET-8.0-purple)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-1.1.0-green)
 
 ---
 

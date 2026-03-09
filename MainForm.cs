@@ -40,11 +40,79 @@ public class MainForm : Form
         _youTube  = new YouTubeService(_settings);
         _lbry     = new LbryService(_settings);
         InitializeComponent();
+        Load += async (_, _) => await EnsureYtDlpAsync();
+    }
+
+    // ── yt-dlp auto-download ──────────────────────────────────────────────
+
+    private async Task EnsureYtDlpAsync()
+    {
+        string ytDlpPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "yt-dlp.exe");
+        if (File.Exists(ytDlpPath)) return;
+
+        var result = MessageBox.Show(
+            "yt-dlp.exe was not found in the app folder.\n\nyt-dlp is required for loading and downloading YouTube videos.\n\nDownload it now automatically?",
+            "yt-dlp Not Found",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
+
+        if (result != DialogResult.Yes) return;
+
+        SetStatus("Downloading yt-dlp...");
+        _btnYtLoad.Enabled = false;
+
+        try
+        {
+            // Get latest release download URL from GitHub API
+            using var http = new System.Net.Http.HttpClient();
+            http.DefaultRequestHeaders.Add("User-Agent", "VidMerger");
+
+            var json = await http.GetStringAsync("https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest");
+            var doc  = System.Text.Json.JsonDocument.Parse(json);
+            var assets = doc.RootElement.GetProperty("assets");
+
+            string? downloadUrl = null;
+            foreach (var asset in assets.EnumerateArray())
+            {
+                string name = asset.GetProperty("name").GetString() ?? "";
+                if (name.Equals("yt-dlp.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    downloadUrl = asset.GetProperty("browser_download_url").GetString();
+                    break;
+                }
+            }
+
+            if (downloadUrl == null)
+            {
+                MessageBox.Show("Could not find yt-dlp.exe in the latest GitHub release.\nPlease download it manually from https://github.com/yt-dlp/yt-dlp/releases",
+                    "Download Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus("Ready.");
+                return;
+            }
+
+            SetStatus("Downloading yt-dlp.exe...");
+            var bytes = await http.GetByteArrayAsync(downloadUrl);
+            await File.WriteAllBytesAsync(ytDlpPath, bytes);
+
+            SetStatus("yt-dlp downloaded successfully.");
+            MessageBox.Show("yt-dlp has been downloaded and is ready to use!",
+                "Download Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to download yt-dlp:\n{ex.Message}\n\nPlease download it manually from https://github.com/yt-dlp/yt-dlp/releases",
+                "Download Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            _btnYtLoad.Enabled = true;
+            SetStatus("Ready.");
+        }
     }
 
     private void InitializeComponent()
     {
-        Text = "VidMerger v1.0";
+        Text = "VidMerger v1.1";
         // App icon
         string icoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.ico");
         if (File.Exists(icoPath))
