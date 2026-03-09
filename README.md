@@ -10,7 +10,7 @@
 
 ## Acknowledgements
 
-This project was inspired by [**techgirltif**](https://github.com/techgirltif) and her original [ContentCreatorManager](https://github.com/techgirltif/ContentCreatorManager) — a Python-based tool for managing and syncing content across platforms. VidMerger takes that same core idea and reimplements it as a standalone C# / WinForms desktop application with an expanded feature set. Big thanks to techgirltif for the inspiration and the original concept.
+This project was inspired by [**tiff1002**](https://github.com/tiff1002) and her original [ContentCreatorManager](https://github.com/tiff1002/ContentCreatorManager) — a Python-based tool for managing and syncing content across platforms. VidMerger takes that same core idea and reimplements it as a standalone C# / WinForms desktop application with an expanded feature set. Big thanks to tiff1002 for the inspiration and the original concept.
 
 ---
 
